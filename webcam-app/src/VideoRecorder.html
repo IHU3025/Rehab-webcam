@@ -1,0 +1,95 @@
+<!DOCTYPE <html>
+<html lang = 'en'>
+
+<head>
+    <meta charset = 'UTF-8'>
+    <meta name = 'viewport' content = 'width=device-width, inital-sclae=1.0'>
+    <style>
+        #app{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        video {
+            width: 100%;
+            max-width: 640px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px; 
+        }
+    </style>
+
+
+
+</head>
+<body>
+    <div id = 'app'>
+        <video id = 'video' playsinline autoplay></video>
+        <button id="startRecord"> Start Recording </button>
+        <button id="stopRecord" disabled> Stop Recording </button>
+        <button id="download" disabled>  Download </button>
+
+    </div>   
+
+    <script>
+        const video = document.getElementById('video');
+        const startRecordButton = document.getElementById('startRecord');
+        const stopRecordButton = document.getElementById('stopRecord');
+        const downloadButton = document.getElementById('download');
+
+
+        let mediaRecorder;
+        let recordedChunks = [];
+
+
+        navigator.mediaDevices.getUserMedia({video : true})
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Error accessing the camera', error);
+            });
+        
+        startRecordButton.addEventListener('click', () => {
+            mediaRecorder = new MediaRecorder(video.srcObject);
+
+            mediaRecorder.ondataavailable = handleDataAvailable;
+            mediaRecorder.start();
+
+            startRecordButton.disabled = true;
+            stopRecordButton.disabled = false; 
+        });
+
+        stopRecordButton.addEventListener('click', () => {
+            mediaRecorder.stop();
+
+            startRecordButton.disabled = false;
+            stopRecordButton.disabled = true; 
+            downloadButton.disabled = false; 
+        });
+
+        downloadButton.addEventListener('click', () => {
+            const blob = new Blob(recordedChunks, {type: 'video/webm'});
+            const url = URL.createObjectURL(blob);
+            const a = documenet.createElement('a');
+            a.href = url; 
+            a.download = 'recorded-viedeo.webm';
+            a.click();
+            document.body.removeChild(a);
+
+        });
+
+        function handleDataAvailable(event) {
+            if (evenet.data.size > 0) {
+                recordedChunks.push(event.data)
+            }
+        } 
+
+    </script>
+
+
+
+</body>
+
+
+</html>>
